@@ -46,7 +46,7 @@ std::ostream& operator<<(std::ostream& os, const Tech& tech)
         os << "[No effects.]\n";
     } else {
         int i = 0;
-        for (std::vector<const Effect::EffectsGroup*>::const_iterator it = tech.Effects().begin();
+        for (std::vector<boost::shared_ptr<const Effect::EffectsGroup> >::const_iterator it = tech.Effects().begin();
              it != tech.Effects().end();
              ++it)
         {

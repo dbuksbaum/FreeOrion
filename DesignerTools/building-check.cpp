@@ -72,7 +72,7 @@ std::ostream& operator<<(std::ostream& os, const BuildingType& building)
         os << "[No effects.]\n";
     } else {
         int i = 0;
-        for (std::vector<const Effect::EffectsGroup*>::const_iterator it = building.Effects().begin();
+        for (std::vector<boost::shared_ptr<const Effect::EffectsGroup> >::const_iterator it = building.Effects().begin();
              it != building.Effects().end();
              ++it)
         {
