@@ -1,5 +1,6 @@
 #include "../FreeOrion/util/AppInterface.h"
 #include "../FreeOrion/UI/CUIControls.h"
+#include "../FreeOrion/util/MultiplayerCommon.h"
 #include "../FreeOrion/util/OptionsDB.h"
 #include "../FreeOrion/UI/TechWnd.h"
 #include "SDLGGApp.h"
@@ -157,6 +158,7 @@ private:
         m_ui = boost::shared_ptr<ClientUI>(new ClientUI());
         g_tech_tree_wnd = new TechTreeWnd(AppWidth(), AppHeight());
         Register(g_tech_tree_wnd);
+        g_tech_tree_wnd->ShowCategory(GetOptionsDB().Get<std::string>("category"));
     }
 
     virtual void HandleNonGGEvent(const SDL_Event& event)
@@ -183,6 +185,11 @@ private:
     boost::shared_ptr<ClientUI> m_ui;
 };
 
+// this undoes the line from SDL_main.h that reads "#define main SDL_main"
+#ifdef main
+#undef main
+#endif
+
 extern "C" // use C-linkage, as required by SDL
 int main(int argc, char* argv[])
 {
@@ -190,6 +197,7 @@ int main(int argc, char* argv[])
     try {
         GetOptionsDB().AddFlag('h', "help", "Print this help message.");
 		GetOptionsDB().AddFlag('m', "music-off", "Disables music in the game");
+        GetOptionsDB().Add<std::string>("category", "category of techs to show", "ALL");
         GG::XMLDoc doc;
         GetOptionsDB().SetFromCommandLine(argc, argv);
         GetOptionsDB().Set("UI.sound.enabled", false);
@@ -228,8 +236,4 @@ int main(int argc, char* argv[])
         app.Logger().errorStream() << "main() caught exception(std::exception): " << e.what();
     }
     return 0;
-
 }
-
-
-
