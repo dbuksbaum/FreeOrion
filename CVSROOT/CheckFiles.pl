@@ -25,7 +25,7 @@ while ($#ARGV >= 0) {
 	       last;
 	    }
 	    $lines++;
-	    last if ($lines>$FIRSTLINES);
+	    last if ($lines>$FIRSTNLINES);
 	}
     }
     shift;
