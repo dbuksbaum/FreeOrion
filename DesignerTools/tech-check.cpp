@@ -68,6 +68,7 @@ int main(int argc, char* argv[])
 {
     try {
         GetOptionsDB().AddFlag('h', "help", "Print this help message.");
+        GetOptionsDB().Add<std::string>('c', "category", "Only output techs from a certain category.", "ALL", Validator<std::string>());
         GetOptionsDB().SetFromCommandLine(argc, argv);
         if (GetOptionsDB().Get<bool>("help")) {
             GetOptionsDB().GetUsage(std::cerr);
@@ -84,9 +85,17 @@ int main(int argc, char* argv[])
             settings_dir += '/';
         std::cout << "Loading tech tree file \"" << settings_dir << "techs.xml\" ...\n";
         TechManager& manager = GetTechManager();
-        std::cout << "Tech tree loaded.  Techs are:\n\n\n";
-        for (TechManager::iterator it = manager.begin(); it != manager.end(); ++it) {
-            std::cout << **it;
+        if (boost::to_upper_copy(GetOptionsDB().Get<std::string>("category")) == "ALL") {
+            std::cout << "Tech tree loaded.  Techs are:\n\n\n";
+            for (TechManager::iterator it = manager.begin(); it != manager.end(); ++it) {
+                std::cout << **it;
+            }
+        } else {
+            std::string category = GetOptionsDB().Get<std::string>("category");
+            std::cout << "Tech tree loaded.  Techs in the \"" << category << "\" category are:\n\n\n";
+            for (TechManager::category_iterator it = manager.category_begin(category); it != manager.category_end(category); ++it) {
+                std::cout << **it;
+            }
         }
     } catch (const std::invalid_argument& e) {
         std::cerr << "main() caught exception(std::invalid_arg): " << e.what();
