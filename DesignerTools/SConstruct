@@ -10,9 +10,14 @@ if platform_str == 'posix':
     gg_dir = '../GG/'
     cpppath = ['/usr/local/include/boost-1_32',
                '/usr/include/SDL',
+               '/usr/include/freetype2',
                gg_dir + 'include',
-               gg_dir + 'include/net']
-    libs = ['GiGi']
+               gg_dir + 'include/dialogs',
+               gg_dir + 'include/net',
+               gg_dir + 'include/SDL']
+    libs = ['GiGi',
+            'GiGiNet',
+            'GiGiSDL']
     libpath = ['/usr/local/lib']
     env = Environment(ENV = {'PATH' : os.environ['PATH'],
                              'HOME' : os.environ['HOME']},
@@ -90,8 +95,40 @@ common_source = [fo_dir + 'Empire/Empire.cpp',
                  fo_dir + 'util/VarText.cpp',
                  fo_dir + 'UI/StringTable.cpp']
 
+common_gui_source = [fo_dir + 'UI/BSpline.cpp',
+                     fo_dir + 'UI/ClientUI.cpp',
+                     fo_dir + 'UI/CUIControls.cpp',
+                     fo_dir + 'UI/CUIDrawUtil.cpp',
+                     fo_dir + 'UI/CUI_Wnd.cpp',
+                     fo_dir + 'UI/LinkText.cpp',
+                     fo_dir + 'UI/ToolContainer.cpp',
+                     fo_dir + 'UI/ToolWnd.cpp']
+
+tech_view_source = ['tech-view.cpp',
+                    fo_dir + 'UI/TechWnd.cpp',
+                    fo_dir + 'UI/vcg/grprint.cpp',
+                    fo_dir + 'UI/vcg/main.cpp',
+                    fo_dir + 'UI/vcg/alloc.c',
+                    fo_dir + 'UI/vcg/draw.c',
+                    fo_dir + 'UI/vcg/drawlib.c',
+                    fo_dir + 'UI/vcg/drawstr.c',
+                    fo_dir + 'UI/vcg/fisheye.c',
+                    fo_dir + 'UI/vcg/folding.c',
+                    fo_dir + 'UI/vcg/lex.yy.c',
+                    fo_dir + 'UI/vcg/options.c',
+                    fo_dir + 'UI/vcg/prepare.c',
+                    fo_dir + 'UI/vcg/step0.c',
+                    fo_dir + 'UI/vcg/step1.c',
+                    fo_dir + 'UI/vcg/step2.c',
+                    fo_dir + 'UI/vcg/step3.c',
+                    fo_dir + 'UI/vcg/step4.c',
+                    fo_dir + 'UI/vcg/timelim.c',
+                    fo_dir + 'UI/vcg/tree.c',
+                    fo_dir + 'UI/vcg/y.tab.c']
+
 env.Program(target = 'tech-check', source = ['tech-check.cpp'] + common_source)
 env.Program(target = 'building-check', source = ['building-check.cpp'] + common_source)
+env.Program(target = 'tech-view', source = tech_view_source + common_gui_source + common_source)
 
 TargetSignatures('content')
 
