@@ -1,0 +1,41 @@
+import sys, os, re
+
+upper_re = re.compile(r'[_ABCDEFGHIJKLMNOPQRSTUVWXYZ\d]+')
+
+def load_string_table( base, name ) :
+	path = base + '/' + name
+	
+	table_stream = open( path )
+	
+	string_lines = []
+
+
+	for line in table_stream :
+		line_text = line.strip()
+		if len(line_text)>0 and line_text[0] != "#" :
+			string_lines.append(line_text)
+	
+	table = dict()
+	language = string_lines[0]
+	i = 1
+
+	current_key = None
+	current_text = []
+	
+	while i < len(string_lines)	:
+		match = upper_re.search(string_lines[i])
+		if match != None :
+			# new key found
+			if current_key is None :
+				current_key = string_lines[i]
+			else :
+				table[current_key] = '\n'.join(current_text)
+				current_key = None
+				current_text = []
+		else :
+			current_text.append(string_lines[i])
+		i+=1
+
+	table_stream.close()
+
+	return language, table
