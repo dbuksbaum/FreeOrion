@@ -1,6 +1,6 @@
 import sys, os, re
 
-upper_re = re.compile(r'[_ABCDEFGHIJKLMNOPQRSTUVWXYZ\d]+')
+upper_re = re.compile(r'^[_ABCDEFGHIJKLMNOPQRSTUVWXYZ\d]+$')
 
 def load_string_table( base, name ) :
 	path = base + '/' + name
@@ -30,7 +30,7 @@ def load_string_table( base, name ) :
 				current_key = string_lines[i]
 			else :
 				table[current_key] = '\n'.join(current_text)
-				current_key = None
+				current_key = string_lines[i]
 				current_text = []
 		else :
 			current_text.append(string_lines[i])

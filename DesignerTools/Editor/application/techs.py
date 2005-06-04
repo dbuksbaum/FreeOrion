@@ -65,7 +65,7 @@ class Tech :
 				for elem_node in elem_nodes :
 					getattr( load_tech, lists[i][0] ).append(get_child_data(elem_node))
 
-		print "\tTech",load_tech.name,"loaded..."
+		#print "\tTech",load_tech.name,"loaded..."
 
 		return load_tech
 
