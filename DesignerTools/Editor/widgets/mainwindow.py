@@ -3,6 +3,7 @@ pygtk.require('2.0')
 import gtk
 import gtk.glade
 import sys
+from tools import not_implemented_feature_dialog
 
 import application
 
@@ -39,16 +40,10 @@ class MainWindowController :
 		application.instance.ui_facade.show_tech_window()		
 
 
-	def not_implemented_feature_dialog( self ) :
-		msg_dialog = gtk.MessageDialog( parent=self.window,type=gtk.MESSAGE_ERROR,buttons=gtk.BUTTONS_CLOSE,
-										message_format='This feature has been not implemented yet!')
-		msg_dialog.run()
-		msg_dialog.hide()
-		msg_dialog.destroy()
 
 	def on_new_game_dataset_activated( self, *args ) :	
 		print "Creating new game dataset..."
-		self.not_implemented_feature_dialog()
+		not_implemented_feature_dialog(self.window)
 				
 
 	def on_open_existing_dataset_activated( self, *args ) :		
