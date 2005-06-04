@@ -399,8 +399,8 @@
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
-  <property name="default_width">800</property>
-  <property name="default_height">600</property>
+  <property name="default_width">1024</property>
+  <property name="default_height">768</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
   <property name="decorated">True</property>
@@ -438,7 +438,7 @@
 		      <signal name="activate" handler="on_approve_changes_item_activate" last_modification_time="Tue, 31 May 2005 21:40:31 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image37">
+			<widget class="GtkImage" id="image45">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-yes</property>
 			  <property name="icon_size">1</property>
@@ -460,7 +460,7 @@
 		      <signal name="activate" handler="on_discard_changes_item_activate" last_modification_time="Tue, 31 May 2005 21:40:31 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image38">
+			<widget class="GtkImage" id="image46">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-no</property>
 			  <property name="icon_size">1</property>
@@ -520,7 +520,7 @@
 	  <property name="border_width">6</property>
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="position">200</property>
+	  <property name="position">400</property>
 
 	  <child>
 	    <widget class="GtkVBox" id="techs_list_container">
@@ -573,11 +573,11 @@
 			<widget class="GtkTreeView" id="techs_list_view">
 			  <property name="visible">True</property>
 			  <property name="can_focus">True</property>
-			  <property name="headers_visible">False</property>
+			  <property name="headers_visible">True</property>
 			  <property name="rules_hint">True</property>
 			  <property name="reorderable">False</property>
 			  <property name="enable_search">True</property>
-			  <property name="fixed_height_mode">True</property>
+			  <property name="fixed_height_mode">False</property>
 			  <property name="hover_selection">False</property>
 			  <property name="hover_expand">False</property>
 			</widget>
@@ -607,7 +607,7 @@
 	    <widget class="GtkHPaned" id="left_pan">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
-	      <property name="position">600</property>
+	      <property name="position">900</property>
 
 	      <child>
 		<widget class="GtkVBox" id="tech_details_container">
@@ -1145,7 +1145,7 @@
 				  <property name="visible">True</property>
 				  <property name="tooltip" translatable="yes">Techs required to be researched before player can research them</property>
 				  <property name="can_focus">True</property>
-				  <property name="headers_visible">False</property>
+				  <property name="headers_visible">True</property>
 				  <property name="rules_hint">True</property>
 				  <property name="reorderable">False</property>
 				  <property name="enable_search">True</property>
@@ -1163,7 +1163,7 @@
 			  </child>
 
 			  <child>
-			    <widget class="GtkHBox" id="hbox2">
+			    <widget class="GtkHBox" id="prerequisites_button_container">
 			      <property name="visible">True</property>
 			      <property name="homogeneous">True</property>
 			      <property name="spacing">6</property>
@@ -1204,8 +1204,8 @@
 			    </widget>
 			    <packing>
 			      <property name="padding">0</property>
-			      <property name="expand">True</property>
-			      <property name="fill">True</property>
+			      <property name="expand">False</property>
+			      <property name="fill">False</property>
 			    </packing>
 			  </child>
 			</widget>
@@ -1233,7 +1233,7 @@
 		<widget class="GtkVPaned" id="top_vertical_pan">
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
-		  <property name="position">400</property>
+		  <property name="position">350</property>
 
 		  <child>
 		    <widget class="GtkVBox" id="unlocked_container">
@@ -1281,7 +1281,7 @@
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Items this tech will unlock</property>
 			      <property name="can_focus">True</property>
-			      <property name="headers_visible">False</property>
+			      <property name="headers_visible">True</property>
 			      <property name="rules_hint">True</property>
 			      <property name="reorderable">False</property>
 			      <property name="enable_search">True</property>
@@ -1398,7 +1398,7 @@
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Effects this tech will trigger</property>
 			      <property name="can_focus">True</property>
-			      <property name="headers_visible">False</property>
+			      <property name="headers_visible">True</property>
 			      <property name="rules_hint">True</property>
 			      <property name="reorderable">False</property>
 			      <property name="enable_search">True</property>
