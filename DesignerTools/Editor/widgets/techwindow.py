@@ -1,9 +1,13 @@
+import os, sys
+
 import pygtk
 pygtk.require('2.0')
 import gtk
 import gtk.glade
+import gtk.gdk
 
-from tools import not_implemented_feature_dialog
+from tools import not_implemented_feature_dialog, recoverable_error
+from prereq_adder import *
 import application
 
 class TechWindowController :
@@ -17,7 +21,9 @@ class TechWindowController :
 		self.view.signal_connect('on_approve_changes_item_activate', self.on_changes_approved )
 		self.view.signal_connect('on_discard_changes_item_activate', self.on_changes_discarded )
 		self.view.signal_connect('on_find_tech_item_activate', self.on_find_tech )
-		self.view.signal_connect('on_language_item_activate', self.on_change_language_display )	
+		self.view.signal_connect('on_language_item_activate', self.on_change_language_display )
+		self.view.signal_connect('on_add_prerequisite_clicked', self.__on_add_prerequisite )
+		self.view.signal_connect('on_remove_prerequisite_clicked', self.__on_remove_prerequisites )	
 		self.window.connect('delete_event', self.on_window_deleted )
 
 		# models for tech tree, prerequisite, unlocked items and effects lists
@@ -35,6 +41,42 @@ class TechWindowController :
 		self.current_tech = None
 		self.modified_techs = dict()
 		
+	def __on_add_prerequisite( self, button, *args ) :
+		print "Adding prerequisites..."
+
+		dialog = PrerequisitesAdderController()		
+
+		techs_to_add = dialog.execute()
+
+		if len(techs_to_add) == 0 : return
+	
+		for tech in techs_to_add :
+			try:
+				self.current_tech.prerequisites.index(tech)
+				continue
+			except ValueError :
+				self.current_tech.prerequisites.append(tech)
+				self.current_tech.modified = True
+
+		self.__display_prerequisites()
+
+
+	def __on_remove_prerequisites( self, button, *args ) :
+		if self.current_tech is None : return
+
+		print "Removing a prerequisite"
+		prereq_view = self.view.get_widget('prerequisites_view')
+		_, paths = prereq_view.get_selection().get_selected_rows()
+		techs_to_remove = []
+		if len(paths) > 0 :
+			for path in paths :
+				iter = self.prereq_list.get_iter(path)
+				tech_id = self.prereq_list.get_value(iter,0)
+				self.current_tech.prerequisites.remove(tech_id)
+			
+			self.current_tech.modified = True
+			self.__display_prerequisites()
+
 	def __setup_techs_list_view( self ) :
 		techs_list = self.view.get_widget('techs_list_view')
 
@@ -59,10 +101,10 @@ class TechWindowController :
 		if self.current_tech is None : return
 		if self.current_tech.modified is True :
 			self.modified_techs[self.current_tech.name] = self.current_tech
-		print "Techs modified count", len(self.modified_techs.values())
+		#print "Techs modified count", len(self.modified_techs.values())
 
 	def __get_tech_for_edit( self, tech ) :
-		print "Tech", tech.name, "was selected"
+		#print "Tech", tech.name, "was selected"
 		self.__undo_bookkeeping()
 		try :
 			self.current_tech = self.modified_techs[tech.name]
@@ -71,16 +113,131 @@ class TechWindowController :
 		
 
 	def __on_tech_activated( self, treeview, path, view_column, *args ) :
-		print "Row on techs list at path", path, "activated"
 		iter = self.tech_tree.get_iter(path)
 		tech_id = self.tech_tree.get_value( iter, 0 )
 		tech_set = application.instance.tech_set
 		try:
 			tech = tech_set.tech_entries[tech_id]
-			self.__get_tech_for_edit( tech )			
+			self.__get_tech_for_edit( tech )
+			self.__display_current_tech()			
 		except KeyError :
-			print tech_id, "is not a tech"
+			pass
+			#print tech_id, "is not a tech"
 			
+
+	def __display_current_tech( self ) :
+		print "Displaying", self.current_tech.name
+		self.__display_scalars()
+		self.__display_lists()
+
+	def __display_scalars( self ) :
+		strings = application.instance.supported_languages['English']
+		name_id_txt = self.view.get_widget('tech_name_identifier_entry')
+		name_id_txt.set_text( self.current_tech.name )
+		name_str_txt = self.view.get_widget('tech_name_string_entry' )
+		try:
+			name_str_txt.set_text( strings[self.current_tech.name] )
+		except KeyError :
+			pass
+
+		type_id_txt = self.view.get_widget('tech_type_identifier_entry')
+		type_id_txt.set_text( self.current_tech.type )
+		
+		type_str_txt = self.view.get_widget('tech_type_string_entry')
+		try:
+			type_str_txt.set_text( strings[self.current_tech.type] )
+		except KeyError :
+			pass
+
+		cat_id_txt = self.view.get_widget('tech_cat_identifier_entry' )
+		cat_id_txt.set_text( self.current_tech.category )
+	
+		cat_str_txt = self.view.get_widget('tech_cat_string_entry' )
+		try:
+			cat_str_txt.set_text( strings[self.current_tech.category] )
+		except KeyError :
+			pass
+
+		desc_str_txt = self.view.get_widget('description_view')
+		desc_txt_buffer = gtk.TextBuffer()
+	
+		try:
+			desc_txt_buffer.set_text( strings[self.current_tech.description] )
+		except KeyError :
+			pass		
+
+		desc_str_txt.set_buffer( desc_txt_buffer )
+
+		cost_button = self.view.get_widget('tech_cost_button')
+		cost_button.set_value( self.current_tech.research_cost )
+		
+		turns_button = self.view.get_widget('tech_turns_button')
+		turns_button.set_value( self.current_tech.research_turns )	
+
+		icon = self.__load_tech_icon()	
+		
+		tech_image = self.view.get_widget('tech_image')
+		tech_image.set_from_pixbuf( icon )
+
+	def __load_tech_icon( self ) :
+		basedir = application.instance.dataset_folder
+		artdir = 'data/art'
+		if self.current_tech.graphic is None or len(self.current_tech.graphic) == 0:
+			icon_path = 'no_image.png'
+		else :
+			icon_path = "%s/%s/%s"%(basedir,artdir,self.current_tech.graphic)
+			if not os.path.exists(icon_path) :
+				recoverable_error(self.window,"Specified icon file does not exist: %s"%icon_path)
+				icon_path = 'no_image.png'
+		return gtk.gdk.pixbuf_new_from_file(icon_path)	
+	
+	def __display_prerequisites( self ) :
+		english_strings = application.instance.supported_languages['English']
+
+		prereq_view = self.view.get_widget('prerequisites_view')
+		prereq_view.set_model(None)
+		self.prereq_list.clear()
+		for prereq in self.current_tech.prerequisites :
+			try:
+				self.prereq_list.append((prereq,english_strings[prereq]))
+			except KeyError :
+				self.prereq_list.append((prereq,""))
+					
+		prereq_view.set_model(self.prereq_list)
+
+	def __display_effects( self ) :
+		english_strings = application.instance.supported_languages['English']
+		effects_view = self.view.get_widget('effects_view')	
+		effects_view.set_model(None)
+		self.effects_list.clear()
+
+		for effect in self.current_tech.effects :
+			try:
+				self.effects_list.append((effect,english_strings[effect]) )
+			except KeyError :
+				self.effects_list.append((effect,""))
+
+		effects_view.set_model(self.effects_list)
+
+	def __display_unlocked_items( self ) :
+		english_strings = application.instance.supported_languages['English']
+		items_view = self.view.get_widget('unlocked_items_view')
+		items_view.set_model(None)
+		self.items_list.clear()
+		
+		for item in self.current_tech.unlocked_items :
+			try:
+				self.items_list.append((item,english_strings[item]) )
+			except KeyError :
+				self.items_list.append((item,""))
+
+		items_view.set_model(self.items_list)
+
+	def __display_lists( self ) :
+		self.__display_prerequisites()
+		self.__display_unlocked_items()
+		self.__display_effects()
+
 
 	def __setup_prerequisites_view( self ) :
 		prereqs_list = self.view.get_widget('prerequisites_view')
