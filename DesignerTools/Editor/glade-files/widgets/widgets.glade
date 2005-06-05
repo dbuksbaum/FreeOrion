@@ -605,6 +605,7 @@
 			  <property name="use_stock">True</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
 			  <property name="focus_on_click">True</property>
+			  <signal name="clicked" handler="on_add_tech_button_clicked" last_modification_time="Sun, 05 Jun 2005 21:41:39 GMT"/>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -622,6 +623,7 @@
 			  <property name="use_stock">True</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
 			  <property name="focus_on_click">True</property>
+			  <signal name="clicked" handler="on_remove_tech_button_clicked" last_modification_time="Sun, 05 Jun 2005 21:41:28 GMT"/>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -736,7 +738,7 @@
 				<widget class="GtkEntry" id="tech_name_identifier_entry">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
-				  <property name="editable">True</property>
+				  <property name="editable">False</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
 				  <property name="text" translatable="yes"></property>
@@ -755,7 +757,7 @@
 				<widget class="GtkEntry" id="tech_name_string_entry">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
-				  <property name="editable">True</property>
+				  <property name="editable">False</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
 				  <property name="text" translatable="yes"></property>
@@ -796,16 +798,13 @@
 			      </child>
 
 			      <child>
-				<widget class="GtkEntry" id="tech_type_identifier_entry">
+				<widget class="GtkComboBoxEntry" id="tech_type_combo_box">
+				  <property name="border_width">1</property>
 				  <property name="visible">True</property>
-				  <property name="can_focus">True</property>
-				  <property name="editable">True</property>
-				  <property name="visibility">True</property>
-				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes"></property>
+				  <property name="add_tearoffs">False</property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
-				  <property name="activates_default">False</property>
+				  <property name="focus_on_click">True</property>
+				  <signal name="changed" handler="on_tech_type_combo_box_changed" last_modification_time="Sun, 05 Jun 2005 20:34:01 GMT"/>
 				</widget>
 				<packing>
 				  <property name="padding">0</property>
@@ -818,7 +817,7 @@
 				<widget class="GtkEntry" id="tech_type_string_entry">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
-				  <property name="editable">True</property>
+				  <property name="editable">False</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
 				  <property name="text" translatable="yes"></property>
@@ -859,16 +858,13 @@
 			      </child>
 
 			      <child>
-				<widget class="GtkEntry" id="tech_cat_identifier_entry">
+				<widget class="GtkComboBoxEntry" id="tech_category_combo_box">
+				  <property name="border_width">1</property>
 				  <property name="visible">True</property>
-				  <property name="can_focus">True</property>
-				  <property name="editable">True</property>
-				  <property name="visibility">True</property>
-				  <property name="max_length">0</property>
-				  <property name="text" translatable="yes"></property>
+				  <property name="add_tearoffs">False</property>
 				  <property name="has_frame">True</property>
-				  <property name="invisible_char">*</property>
-				  <property name="activates_default">False</property>
+				  <property name="focus_on_click">True</property>
+				  <signal name="changed" handler="on_tech_category_combo_box_changed" last_modification_time="Sun, 05 Jun 2005 20:34:08 GMT"/>
 				</widget>
 				<packing>
 				  <property name="padding">0</property>
@@ -881,7 +877,7 @@
 				<widget class="GtkEntry" id="tech_cat_string_entry">
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
-				  <property name="editable">True</property>
+				  <property name="editable">False</property>
 				  <property name="visibility">True</property>
 				  <property name="max_length">0</property>
 				  <property name="text" translatable="yes"></property>
@@ -932,6 +928,7 @@
 				  <property name="snap_to_ticks">False</property>
 				  <property name="wrap">False</property>
 				  <property name="adjustment">0 0 100 1 10 10</property>
+				  <signal name="value_changed" handler="on_tech_cost_button_value_changed" last_modification_time="Sun, 05 Jun 2005 18:13:07 GMT"/>
 				</widget>
 				<packing>
 				  <property name="padding">0</property>
@@ -976,6 +973,7 @@
 				  <property name="snap_to_ticks">False</property>
 				  <property name="wrap">False</property>
 				  <property name="adjustment">1 0 100 1 10 10</property>
+				  <signal name="value_changed" handler="on_tech_turns_button_value_changed" last_modification_time="Sun, 05 Jun 2005 18:13:52 GMT"/>
 				</widget>
 				<packing>
 				  <property name="padding">0</property>
@@ -1119,7 +1117,7 @@
 				  <property name="editable">True</property>
 				  <property name="overwrite">False</property>
 				  <property name="accepts_tab">True</property>
-				  <property name="justification">GTK_JUSTIFY_FILL</property>
+				  <property name="justification">GTK_JUSTIFY_LEFT</property>
 				  <property name="wrap_mode">GTK_WRAP_WORD</property>
 				  <property name="cursor_visible">True</property>
 				  <property name="pixels_above_lines">3</property>
