@@ -45,10 +45,7 @@ class Tech :
 		data = []
 		for i in range(len(children)) :
 			if len(children[i]) == 0 :
-				if strings[i] == 'graphic' :
-					data.append("no_image.png")
-				else :
-					data.append("DUMMY_"+strings[i].upper())
+					data.append(None)
 			else :
 				data.append(get_child_data( children[i][0] ))
 
