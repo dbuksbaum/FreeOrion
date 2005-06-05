@@ -2,6 +2,22 @@ import sys, os, re
 
 upper_re = re.compile(r'^[_ABCDEFGHIJKLMNOPQRSTUVWXYZ\d]+$')
 
+def store_string_table( base, name, language, table ) :
+	filename = base + '/' + name
+	
+	table_stream = open( filename, 'w' )
+
+	print >> table_stream, language
+	print >> table_stream	
+
+	for key, value in table.items() :
+		print >> table_stream, key
+		print >> table_stream, value
+		print >> table_stream
+
+	table_stream.close()
+	
+
 def load_string_table( base, name ) :
 	path = base + '/' + name
 	
