@@ -1,4 +1,4 @@
-import sys, os, re
+import sys, os, re, copy
 from xml.dom import minidom
 
 def get_child_data( parent ) :
@@ -7,6 +7,8 @@ def get_child_data( parent ) :
 
 
 class Tech :
+	
+	types = ['TT_THEORY','TT_APPLICATION','TT_REFINEMENT']
 
 	def __init__(self) :
 		self.name = "DUMMY_TECH"
@@ -22,19 +24,55 @@ class Tech :
 		self.modified = False
 
 	def copy( self ) :
-		copy_obj = Tech()
-		copy_obj.name = self.name
-		copy_obj.description = self.description
-		copy_obj.type = self.type
-		copy_obj.category = self.category
-		copy_obj.research_cost = self.research_cost
-		copy_obj.research_turns = self.research_turns
-		copy_obj.prerequisites = [ prereq for prereq in self.prerequisites ]
-		copy_obj.unlocked_items = [ item for item in self.unlocked_items ]
-		copy_obj.effects = [effect for effect in self.effects ]
-		copy_obj.graphic = self.graphic
-		copy_obj.modified = self.modified
-		return copy_obj
+		return copy.deepcopy(self)
+
+	def to_xml( self ) :
+		strings = []
+
+		strings.append( '<Tech>' )
+		strings.append( '<name>%s</name>'%self.name )
+		strings.append( '<description>%s</description>'%self.description )
+		strings.append( '<type>%s</type>'%self.type )
+		strings.append( '<category>%s</category>'%self.category )
+		strings.append( '<research_cost>%s</research_cost>'%self.research_cost )
+		strings.append( '<research_turns>%s</research_turns>'%self.research_turns )
+
+		items_strings = []
+		if len(self.prerequisites) == 0 :
+			strings.append( '<prerequisites/>' )
+		else :		
+			strings.append( '<prerequisites>' )
+			for prereq in self.prerequisites :
+				items_strings.append( '<prereq>%s</prereq>'%prereq )
+			strings.append( '\n'.join(items_strings) )
+			strings.append( '</prerequisites>' )
+
+		if len( self.unlocked_items ) == 0 :
+			strings.append( '<unlocked_items/>' )
+		else :
+			strings.append( '<unlocked_items>' )
+			items_strings = []
+			for item in self.unlocked_items :
+				items_strings.append( '<item>%s</item>'%item )
+			strings.append( '\n'.join(items_strings) )
+			strings.append( '</unlocked_items>' )
+
+		if len( self.effects ) == 0 :
+			strings.append( '<effects/>' )
+		else :
+			strings.append( '<effects>' )
+			items_strings = []
+			for effect in self.effects :
+				items_strings.append( '<effect>%s</effect>'%effect )
+			strings.append( '\n'.join(items_strings) )
+			strings.append( '</effects>' )
+
+		if ( self.graphic is None ) :
+			strings.append( '<graphic/>')
+		else :
+			strings.append( '<graphic>%s</graphic>'%self.graphic )
+		strings.append( '</Tech>' )
+		return '\n'.join(strings)
 
 	def load_from_xml_node( klass, xml_node ) :
 		load_tech = Tech()
@@ -96,7 +134,24 @@ class GameTechs :
 	
 	def add_new_tech( self, tech ) :
 		self.tech_entries[tech.name] = tech
-		self.tech_categories[tech.category].append(tech)
+		self.tech_categories[tech.category].append(tech.name)
+
+	def store_techs( self, basename, path ) :
+		filename = basename + '/' + path
+		techs_stream = open( filename, 'w' )
+
+		print >> techs_stream, '<?xml version="1.0" encoding="UTF-8" ?>'
+		print >> techs_stream, '<GG::XMLDoc>'
+		
+		for category, tech_names in self.tech_categories.items() :
+			if category == 'DUMMY_CATEGORY' : continue
+			print >> techs_stream, '<Category>%s</Category>'%category
+			for tech_name in tech_names :
+				print >> techs_stream, self.tech_entries[tech_name].to_xml()
+
+		print >> techs_stream, '</GG::XMLDoc>'
+
+		techs_stream.close()
 
 def load_techs_descriptions( basename, path ) :
 	path = basename + '/' + path
