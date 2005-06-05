@@ -8,6 +8,7 @@ import gtk.gdk
 
 from tools import not_implemented_feature_dialog, recoverable_error
 from prereq_adder import *
+from application.techs import Tech
 import application
 
 class TechWindowController :
@@ -23,7 +24,15 @@ class TechWindowController :
 		self.view.signal_connect('on_find_tech_item_activate', self.on_find_tech )
 		self.view.signal_connect('on_language_item_activate', self.on_change_language_display )
 		self.view.signal_connect('on_add_prerequisite_clicked', self.__on_add_prerequisite )
-		self.view.signal_connect('on_remove_prerequisite_clicked', self.__on_remove_prerequisites )	
+		self.view.signal_connect('on_remove_prerequisite_clicked', self.__on_remove_prerequisites )
+
+		self.view.signal_connect('on_tech_cost_button_value_changed', self.__on_tech_cost_changed )
+		self.view.signal_connect('on_tech_turns_button_value_changed', self.__on_tech_turns_changed )
+		self.view.signal_connect('on_tech_type_combo_box_changed', self.__on_tech_type_changed )
+		
+		self.view.signal_connect('on_add_tech_button_clicked', self.__on_add_tech )
+		self.view.signal_connect('on_remove_tech_button_clicked', self.__on_remove_tech )
+	
 		self.window.connect('delete_event', self.on_window_deleted )
 
 		# models for tech tree, prerequisite, unlocked items and effects lists
@@ -38,10 +47,128 @@ class TechWindowController :
 		self.__setup_unlocked_items_view()
 		self.__setup_effects_view()
 
+		# combo-boxes setup
+		self.tech_types_list = gtk.ListStore(str)
+		self.tech_categories_list = gtk.ListStore(str)
+		self.__setup_tech_types_combo_box()
+		self.__setup_tech_categories_combo_box()
+
+		self.desc_text_buffer = gtk.TextBuffer()
+		self.desc_text_buffer.connect('modified-changed', self.__on_description_changed )
+		
 		self.current_tech = None
 		self.modified_techs = dict()
+		self.refreshing = False
+
+	def __on_add_tech( self, button, *args ) :
+		pass
+
+	def __on_remove_tech( self, button, *args ) :
+		print "Removing a tech..."
+		techs_list_view = self.view.get_widget('techs_list_view')
+		_, paths = techs_list_view.get_selection().get_selected_rows()
+		techs_to_remove = []
+		if len(paths) > 0 :
+			for path in paths :
+				iter = self.tech_tree.get_iter(path)
+				tech_id = self.tech_tree.get_value(iter,0)
+				techs_to_remove.append(tech_id)
+		else :
+			return
+
+		strings = application.instance.supported_languages['English']
+		tech_listing = []
+		for tech_id in techs_to_remove :
+			tech_listing.append( "%s %s"%(tech_id, strings[tech_id]) )
 		
+		message = """You are going to remove the following techs:
+
+%s
+
+Are you sure you wish to remove them?"""%'\n'.join(tech_listing)			
+
+		dialog = gtk.MessageDialog( parent=self.window, type=gtk.MESSAGE_WARNING,buttons=gtk.BUTTONS_YES_NO,
+									message_format=message )
+		response = dialog.run()
+			
+		if response == gtk.RESPONSE_YES :
+			print "User wants to remove techs..."
+			
+
+		dialog.hide()
+		dialog.destroy()
+
+	def __on_tech_type_changed( self, combobox, *args ) :
+		if self.current_tech is None or self.refreshing: return
+		
+		iter = combobox.get_active_iter()
+
+		# This is necessary because there seems to be a bug in
+		# PyGtk that gets the changed signal emitted thrice:
+		# once with an iter, and twice with a null iter...
+		if iter is None : return
+
+		selected_type = self.tech_types_list.get_value(iter,0)
+		self.current_tech.tech_type = selected_type
+
+
+		combobox.child.set_text(selected_type)
+		self.current_tech.type = selected_type
+		self.current_tech.modified = True
+	
+		strings = application.instance.supported_languages['English']
+		type_str_txt = self.view.get_widget('tech_type_string_entry')
+		try:
+			type_str_txt.set_text( strings[self.current_tech.type] )
+		except KeyError :
+			pass
+
+	def __setup_tech_types_combo_box( self ) :
+		tech_type_combo = self.view.get_widget( 'tech_type_combo_box' )	
+		tech_type_combo.set_model(None)
+		cell = gtk.CellRendererText()
+		tech_type_combo.pack_start(cell, True)
+		tech_type_combo.add_attribute(cell, 'text', 0)
+		for type in Tech.types :
+			self.tech_types_list.append( (type,) ) 		
+
+		tech_type_combo.set_model(self.tech_types_list)
+
+	def __setup_tech_categories_combo_box( self ) :
+		tech_cat_combo = self.view.get_widget( 'tech_category_combo_box' )
+		tech_cat_combo.set_model( None )
+		cell = gtk.CellRendererText()
+		tech_cat_combo.pack_start(cell, True)
+		tech_cat_combo.add_attribute(cell, 'text', 0)
+		tech_set = application.instance.tech_set
+		for cat_identifier in tech_set.tech_categories.keys() :
+			self.tech_categories_list.append( (cat_identifier,) )		
+
+		tech_cat_combo.set_model( self.tech_categories_list ) 
+
+	def __on_tech_cost_changed( self, button, *args ) :
+		if self.current_tech is None or self.refreshing : return
+		self.current_tech.research_cost = button.get_value_as_int()	
+		self.current_tech.modified = True
+		print self.current_tech.name, "was changed!"
+		
+	def __on_tech_turns_changed( self, button, *args ) :
+		if self.current_tech is None or self.refreshing: return
+
+		self.current_tech.research_turns = button.get_value_as_int()
+		self.current_tech.modified = True
+		print self.current_tech.name, "was changed!"
+
+	def __on_description_changed( self, textbuffer, *args ) :
+		if self.current_tech is None or self.refreshing: return
+
+		strings = application.instance.supported_languages['English']
+		strings[self.current_tech.description] = textbuffer.get_text(textbuffer.get_start_iter(), textbuffer.get_end_iter())				
+
+		self.current_tech.modified = True	
+
 	def __on_add_prerequisite( self, button, *args ) :
+		if self.current_tech is None : return
 		print "Adding prerequisites..."
 
 		dialog = PrerequisitesAdderController()		
@@ -127,8 +254,10 @@ class TechWindowController :
 
 	def __display_current_tech( self ) :
 		print "Displaying", self.current_tech.name
+		self.refreshing = True
 		self.__display_scalars()
 		self.__display_lists()
+		self.refreshing = False
 
 	def __display_scalars( self ) :
 		strings = application.instance.supported_languages['English']
@@ -138,10 +267,10 @@ class TechWindowController :
 		try:
 			name_str_txt.set_text( strings[self.current_tech.name] )
 		except KeyError :
-			pass
+			name_str_txt.set_text("")
 
-		type_id_txt = self.view.get_widget('tech_type_identifier_entry')
-		type_id_txt.set_text( self.current_tech.type )
+		type_combo = self.view.get_widget('tech_type_combo_box')
+		type_combo.child.set_text( self.current_tech.type )
 		
 		type_str_txt = self.view.get_widget('tech_type_string_entry')
 		try:
@@ -149,8 +278,8 @@ class TechWindowController :
 		except KeyError :
 			pass
 
-		cat_id_txt = self.view.get_widget('tech_cat_identifier_entry' )
-		cat_id_txt.set_text( self.current_tech.category )
+		category_combo = self.view.get_widget('tech_category_combo_box' )
+		category_combo.child.set_text( self.current_tech.category )
 	
 		cat_str_txt = self.view.get_widget('tech_cat_string_entry' )
 		try:
@@ -159,14 +288,13 @@ class TechWindowController :
 			pass
 
 		desc_str_txt = self.view.get_widget('description_view')
-		desc_txt_buffer = gtk.TextBuffer()
 	
 		try:
-			desc_txt_buffer.set_text( strings[self.current_tech.description] )
+			self.desc_text_buffer.set_text( strings[self.current_tech.description] )
 		except KeyError :
-			pass		
+			self.desc_text_buffer.set_text("")		
 
-		desc_str_txt.set_buffer( desc_txt_buffer )
+		desc_str_txt.set_buffer( self.desc_text_buffer )
 
 		cost_button = self.view.get_widget('tech_cost_button')
 		cost_button.set_value( self.current_tech.research_cost )
@@ -295,6 +423,17 @@ class TechWindowController :
 
 
 	def on_changes_approved( self, *args ) :
+		self.__undo_bookkeeping()
+		if len(self.modified_techs) > 0 :
+			print len(self.modified_techs), "techs modified"
+			tech_set = application.instance.tech_set
+			for tech in self.modified_techs.values() :
+				tech_set.tech_entries[tech.name] = tech
+			application.instance.techs_modified = True
+			application.instance.strings_modified = True
+		else :
+			print "There were no changes..."
+
 		self.window.hide()
 		self.window.destroy()
 	
@@ -332,8 +471,8 @@ class TechWindowController :
 				piter = self.tech_tree.append( None, (category_identifier, "") )
 			for tech in  tech_list :
 				try:	
-					self.tech_tree.append( piter, (tech.name, english_strings[tech.name]) )
+					self.tech_tree.append( piter, (tech, english_strings[tech]) )
 				except KeyError :
-					self.tech_tree.append( piter, (tech.name, "") )
+					self.tech_tree.append( piter, (tech, "") )
 		
 		self.view.get_widget('techs_list_view').set_model(self.tech_tree)
