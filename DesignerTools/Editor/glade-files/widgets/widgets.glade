@@ -1149,7 +1149,7 @@
 				  <property name="rules_hint">True</property>
 				  <property name="reorderable">False</property>
 				  <property name="enable_search">True</property>
-				  <property name="fixed_height_mode">True</property>
+				  <property name="fixed_height_mode">False</property>
 				  <property name="hover_selection">False</property>
 				  <property name="hover_expand">False</property>
 				</widget>
@@ -1285,7 +1285,7 @@
 			      <property name="rules_hint">True</property>
 			      <property name="reorderable">False</property>
 			      <property name="enable_search">True</property>
-			      <property name="fixed_height_mode">True</property>
+			      <property name="fixed_height_mode">False</property>
 			      <property name="hover_selection">False</property>
 			      <property name="hover_expand">False</property>
 			    </widget>
@@ -1402,7 +1402,7 @@
 			      <property name="rules_hint">True</property>
 			      <property name="reorderable">False</property>
 			      <property name="enable_search">True</property>
-			      <property name="fixed_height_mode">True</property>
+			      <property name="fixed_height_mode">False</property>
 			      <property name="hover_selection">False</property>
 			      <property name="hover_expand">False</property>
 			    </widget>
