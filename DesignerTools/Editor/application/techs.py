@@ -19,6 +19,22 @@ class Tech :
 		self.unlocked_items = []
 		self.effects = []
 		self.graphic = None
+		self.modified = False
+
+	def copy( self ) :
+		copy_obj = Tech()
+		copy_obj.name = self.name
+		copy_obj.description = self.description
+		copy_obj.type = self.type
+		copy_obj.category = self.category
+		copy_obj.research_cost = self.research_cost
+		copy_obj.research_turns = self.research_turns
+		copy_obj.prerequisites = [ prereq for prereq in self.prerequisites ]
+		copy_obj.unlocked_items = [ item for item in self.unlocked_items ]
+		copy_obj.effects = [effect for effect in self.effects ]
+		copy_obj.graphic = self.graphic
+		copy_obj.modified = self.modified
+		return copy_obj
 
 	def load_from_xml_node( klass, xml_node ) :
 		load_tech = Tech()

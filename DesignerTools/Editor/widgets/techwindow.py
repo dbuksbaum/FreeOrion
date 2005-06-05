@@ -31,6 +31,9 @@ class TechWindowController :
 		self.__setup_prerequisites_view()
 		self.__setup_unlocked_items_view()
 		self.__setup_effects_view()
+
+		self.current_tech = None
+		self.modified_techs = dict()
 		
 	def __setup_techs_list_view( self ) :
 		techs_list = self.view.get_widget('techs_list_view')
@@ -49,15 +52,89 @@ class TechWindowController :
 		name_column.add_attribute( cell, 'text', 1)
 
 		techs_list.set_search_column(0)
+		
+		techs_list.connect( 'row-activated', self.__on_tech_activated )
+
+	def __undo_bookkeeping( self ) :
+		if self.current_tech is None : return
+		if self.current_tech.modified is True :
+			self.modified_techs[self.current_tech.name] = self.current_tech
+		print "Techs modified count", len(self.modified_techs.values())
+
+	def __get_tech_for_edit( self, tech ) :
+		print "Tech", tech.name, "was selected"
+		self.__undo_bookkeeping()
+		try :
+			self.current_tech = self.modified_techs[tech.name]
+		except KeyError :
+			self.current_tech = tech.copy()
+		
+
+	def __on_tech_activated( self, treeview, path, view_column, *args ) :
+		print "Row on techs list at path", path, "activated"
+		iter = self.tech_tree.get_iter(path)
+		tech_id = self.tech_tree.get_value( iter, 0 )
+		tech_set = application.instance.tech_set
+		try:
+			tech = tech_set.tech_entries[tech_id]
+			self.__get_tech_for_edit( tech )			
+		except KeyError :
+			print tech_id, "is not a tech"
+			
 
 	def __setup_prerequisites_view( self ) :
-		pass
+		prereqs_list = self.view.get_widget('prerequisites_view')
+
+		identifier_column = gtk.TreeViewColumn('Identifier')
+		prereqs_list.append_column( identifier_column )
+		cell = gtk.CellRendererText()
+		identifier_column.pack_start( cell, True )
+		identifier_column.add_attribute(cell, 'text', 0)		
+		identifier_column.set_sort_column_id(0)
+
+		name_column = gtk.TreeViewColumn('Name')
+		prereqs_list.append_column( name_column )	
+		cell = gtk.CellRendererText()
+		name_column.pack_start( cell, True )
+		name_column.add_attribute( cell, 'text', 1)
+
+		prereqs_list.set_search_column(0)
 	
 	def __setup_unlocked_items_view( self ) :
-		pass
+		items_list = self.view.get_widget('unlocked_items_view')
+
+		identifier_column = gtk.TreeViewColumn('Identifier')
+		items_list.append_column( identifier_column )
+		cell = gtk.CellRendererText()
+		identifier_column.pack_start( cell, True )
+		identifier_column.add_attribute(cell, 'text', 0)		
+		identifier_column.set_sort_column_id(0)
+
+		name_column = gtk.TreeViewColumn('Name')
+		items_list.append_column( name_column )	
+		cell = gtk.CellRendererText()
+		name_column.pack_start( cell, True )
+		name_column.add_attribute( cell, 'text', 1)
+
+		items_list.set_search_column(0)
 	
 	def __setup_effects_view( self ) :
-		pass
+		effects_list = self.view.get_widget('effects_view')
+
+		identifier_column = gtk.TreeViewColumn('Identifier')
+		effects_list.append_column( identifier_column )
+		cell = gtk.CellRendererText()
+		identifier_column.pack_start( cell, True )
+		identifier_column.add_attribute(cell, 'text', 0)		
+		identifier_column.set_sort_column_id(0)
+
+		name_column = gtk.TreeViewColumn('Name')
+		effects_list.append_column( name_column )	
+		cell = gtk.CellRendererText()
+		name_column.pack_start( cell, True )
+		name_column.add_attribute( cell, 'text', 1)
+
+		effects_list.set_search_column(0)
 
 
 	def on_changes_approved( self, *args ) :
@@ -87,6 +164,7 @@ class TechWindowController :
 	def __read_tech_list( self ) :
 
 		self.view.get_widget('techs_list_view').set_model(None)
+		self.tech_tree.clear()
 		tech_set = application.instance.tech_set
 		english_strings = application.instance.supported_languages['English']
 		
