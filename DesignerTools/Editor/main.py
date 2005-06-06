@@ -9,7 +9,7 @@ def main() :
 
 	application.instance.ui_facade.start()
 	
-
+	application.instance.shutdown()
 
 if __name__ == '__main__' :
 	main()
