@@ -1,5 +1,6 @@
 import sys, os, re, copy
 from xml.dom import minidom
+import application, strtable
 
 def get_child_data( parent ) :
 	result =  ''.join([node.data for node in parent.childNodes])
@@ -135,6 +136,16 @@ class GameTechs :
 	def add_new_tech( self, tech ) :
 		self.tech_entries[tech.name] = tech
 		self.tech_categories[tech.category].append(tech.name)
+
+	def remove_tech( self, tech_id ) :
+		tech = self.tech_entries[tech_id]
+
+		strings_for_removal = [tech.name,tech.description]
+		strings = application.instance.supported_languages['English']
+		strtable.remove_entries( strings, strings_for_removal )	
+
+		del self.tech_entries[tech.name]				
+		self.tech_categories[tech.category].remove(tech.name)	
 
 	def store_techs( self, basename, path ) :
 		filename = basename + '/' + path

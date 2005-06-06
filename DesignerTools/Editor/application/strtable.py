@@ -2,6 +2,10 @@ import sys, os, re
 
 upper_re = re.compile(r'^[_ABCDEFGHIJKLMNOPQRSTUVWXYZ\d]+$')
 
+def remove_entries( string_table, strings ) :
+	for string in strings :
+		del string_table[string]
+
 def store_string_table( base, name, language, table ) :
 	filename = base + '/' + name
 	
