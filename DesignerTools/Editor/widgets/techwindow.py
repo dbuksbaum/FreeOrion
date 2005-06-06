@@ -59,9 +59,23 @@ class TechWindowController :
 		self.current_tech = None
 		self.modified_techs = dict()
 		self.refreshing = False
+		self.techs_marked_for_death = []
 
 	def __on_add_tech( self, button, *args ) :
 		pass
+
+	def __handle_current_tech_removal( self ) :
+		# Switch display to first tech in tree another tech
+		self.current_tech = None
+		root_iter = self.tech_tree.get_iter_root()
+		first_tech_iter = self.tech_tree.iter_children( root_iter )
+		if first_tech_iter is None :
+			# clear tech widgets
+			self.__clear_widgets()
+			self.view.get_widget('techs_list_view').set_cursor((0,))
+		else :
+			self.__display_tech_at_iter( first_tech_iter, undo_bookkeeping = False )
+			self.view.get_widget('techs_list_view').set_cursor((0,0))
 
 	def __on_remove_tech( self, button, *args ) :
 		print "Removing a tech..."
@@ -93,6 +107,17 @@ Are you sure you wish to remove them?"""%'\n'.join(tech_listing)
 			
 		if response == gtk.RESPONSE_YES :
 			print "User wants to remove techs..."
+			for tech_id in techs_to_remove :
+				if tech_id == self.current_tech.name :
+					self.__handle_current_tech_removal()
+				try :
+					self.modified_techs[tech_id]
+					del self.modified_techs[tech_id]
+				except KeyError :
+					pass
+			self.techs_marked_for_death += techs_to_remove
+
+			self.__read_tech_list()	
 			
 
 		dialog.hide()
@@ -230,27 +255,75 @@ Are you sure you wish to remove them?"""%'\n'.join(tech_listing)
 			self.modified_techs[self.current_tech.name] = self.current_tech
 		#print "Techs modified count", len(self.modified_techs.values())
 
-	def __get_tech_for_edit( self, tech ) :
+	def __get_tech_for_edit( self, tech, undo_bookkeeping ) :
 		#print "Tech", tech.name, "was selected"
-		self.__undo_bookkeeping()
+		if undo_bookkeeping :
+			self.__undo_bookkeeping()
 		try :
 			self.current_tech = self.modified_techs[tech.name]
 		except KeyError :
 			self.current_tech = tech.copy()
-		
 
-	def __on_tech_activated( self, treeview, path, view_column, *args ) :
-		iter = self.tech_tree.get_iter(path)
+	def __display_tech_at_iter( self, iter, undo_bookkeeping = True ) :
 		tech_id = self.tech_tree.get_value( iter, 0 )
 		tech_set = application.instance.tech_set
 		try:
 			tech = tech_set.tech_entries[tech_id]
-			self.__get_tech_for_edit( tech )
+			self.__get_tech_for_edit( tech, undo_bookkeeping )
 			self.__display_current_tech()			
 		except KeyError :
-			pass
 			#print tech_id, "is not a tech"
+			self.__clear_widgets()
+
+	def __display_tech_at_path( self, path ) :
+		iter = self.tech_tree.get_iter(path)
+		self.__display_tech_at_iter( iter )
+
+	def __on_tech_activated( self, treeview, path, view_column, *args ) :
+		self.__display_tech_at_path(path)	
+
+	def __clear_widgets( self ) :
+		self.refreshing = True
+
+		name_id_txt = self.view.get_widget('tech_name_identifier_entry')
+		name_id_txt.set_text( '' )
+
+		name_str_txt = self.view.get_widget('tech_name_string_entry' )
+		name_str_txt.set_text( '' )
+
+		type_combo = self.view.get_widget('tech_type_combo_box')
+		type_combo.child.set_text( 'TT_THEORY' )
+		
+		type_str_txt = self.view.get_widget('tech_type_string_entry')
+		try:
+			type_str_txt.set_text( strings[self.current_tech.type] )
+		except KeyError :
+			pass
+
+		category_combo = self.view.get_widget('tech_category_combo_box' )
+		category_combo.child.set_text( '' )
+	
+		cat_str_txt = self.view.get_widget('tech_cat_string_entry' )
+		cat_str_txt.set_text( '' )
+
+		self.desc_text_buffer.set_text("")
+
+		cost_button = self.view.get_widget('tech_cost_button')
+		cost_button.set_value( 0 )
+		
+		turns_button = self.view.get_widget('tech_turns_button')
+		turns_button.set_value( 1 )
+
+		icon_path = 'no_image.png'
+		icont = gtk.gdk.pixbuf_new_from_file(icon_path)	
+		tech_image = self.view.get_widget('tech_image')
+		tech_image.set_from_pixbuf( icon )
+
+		self.prereq_list.clear()
+		self.effects_list.clear()
+		self.items_list.clear()
 			
+		self.refreshing = False		
 
 	def __display_current_tech( self ) :
 		print "Displaying", self.current_tech.name
@@ -424,6 +497,16 @@ Are you sure you wish to remove them?"""%'\n'.join(tech_listing)
 
 	def on_changes_approved( self, *args ) :
 		self.__undo_bookkeeping()
+		
+		if len( self.techs_marked_for_death ) > 0 :
+			tech_set = application.instance.tech_set
+			for tech_id in self.techs_marked_for_death :
+				print "Removing tech", tech_id
+				tech_set.remove_tech( tech_id )
+			application.instance.techs_modified = True
+			application.instance.techs_modified = True
+
+
 		if len(self.modified_techs) > 0 :
 			print len(self.modified_techs), "techs modified"
 			tech_set = application.instance.tech_set
@@ -470,6 +553,7 @@ Are you sure you wish to remove them?"""%'\n'.join(tech_listing)
 			except KeyError :
 				piter = self.tech_tree.append( None, (category_identifier, "") )
 			for tech in  tech_list :
+				if tech in self.techs_marked_for_death : continue
 				try:	
 					self.tech_tree.append( piter, (tech, english_strings[tech]) )
 				except KeyError :
