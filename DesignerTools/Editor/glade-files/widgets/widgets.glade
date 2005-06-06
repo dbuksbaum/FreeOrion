@@ -47,7 +47,7 @@
 		      <signal name="activate" handler="on_new_game_dataset_activated" last_modification_time="Sat, 28 May 2005 18:34:00 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image41">
+			<widget class="GtkImage" id="image49">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-new</property>
 			  <property name="icon_size">1</property>
@@ -69,7 +69,7 @@
 		      <signal name="activate" handler="on_open_existing_dataset_activated" last_modification_time="Sat, 28 May 2005 18:34:47 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image42">
+			<widget class="GtkImage" id="image50">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-open</property>
 			  <property name="icon_size">1</property>
@@ -119,41 +119,37 @@
 		<widget class="GtkMenu" id="view_item_menu">
 
 		  <child>
-		    <widget class="GtkCheckMenuItem" id="view_techs_item">
+		    <widget class="GtkMenuItem" id="view_techs_item">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Techs...</property>
 		      <property name="use_underline">True</property>
-		      <property name="active">False</property>
 		      <signal name="activate" handler="on_view_techs_item_activate" last_modification_time="Tue, 31 May 2005 21:19:37 GMT"/>
 		    </widget>
 		  </child>
 
 		  <child>
-		    <widget class="GtkCheckMenuItem" id="view_starnames_item">
+		    <widget class="GtkMenuItem" id="view_starnames_item">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Starnames...</property>
 		      <property name="use_underline">True</property>
-		      <property name="active">False</property>
 		      <signal name="activate" handler="on_view_starnames_item_activate" last_modification_time="Tue, 31 May 2005 21:19:37 GMT"/>
 		    </widget>
 		  </child>
 
 		  <child>
-		    <widget class="GtkCheckMenuItem" id="view_effects_item">
+		    <widget class="GtkMenuItem" id="view_effects_item">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Effects...</property>
 		      <property name="use_underline">True</property>
-		      <property name="active">False</property>
 		      <signal name="activate" handler="on_view_effects_item_activate" last_modification_time="Tue, 31 May 2005 21:19:37 GMT"/>
 		    </widget>
 		  </child>
 
 		  <child>
-		    <widget class="GtkCheckMenuItem" id="view_buildings_item">
+		    <widget class="GtkMenuItem" id="view_buildings_item">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Buildings...</property>
 		      <property name="use_underline">True</property>
-		      <property name="active">False</property>
 		      <signal name="activate" handler="on_view_buildings_item_activate" last_modification_time="Tue, 31 May 2005 21:20:33 GMT"/>
 		    </widget>
 		  </child>
@@ -196,7 +192,7 @@
 		      <signal name="activate" handler="on_about_activated" last_modification_time="Sat, 28 May 2005 18:35:24 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image43">
+			<widget class="GtkImage" id="image51">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-about</property>
 			  <property name="icon_size">1</property>
