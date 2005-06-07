@@ -8,6 +8,7 @@ import gtk.gdk
 
 from tools import not_implemented_feature_dialog, recoverable_error
 from prereq_adder import *
+from tech_adder import *
 from application.techs import Tech
 import application
 
@@ -62,7 +63,12 @@ class TechWindowController :
 		self.techs_marked_for_death = []
 
 	def __on_add_tech( self, button, *args ) :
-		pass
+		
+		dialog_controller = AddTechDlgController()
+
+		tech_created = dialog_controller.execute()
+
+		if tech_created : self.__read_tech_list()
 
 	def __handle_current_tech_removal( self ) :
 		# Switch display to first tech in tree another tech

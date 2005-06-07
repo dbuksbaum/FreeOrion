@@ -43,7 +43,8 @@ class PrerequisitesAdderController :
 				piter = self.tech_tree.append( None, (category_identifier, english_strings[category_identifier]) )
 			except KeyError :
 				piter = self.tech_tree.append( None, (category_identifier, "") )
-			for tech in  tech_list :
+			for tech_name in  tech_list :
+				tech = tech_set.tech_entries[tech_name]
 				try:	
 					self.tech_tree.append( piter, (tech.name, english_strings[tech.name]) )
 				except KeyError :
