@@ -1701,7 +1701,7 @@
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
 
 	  <child>
-	    <widget class="GtkButton" id="cancelbutton2">
+	    <widget class="GtkButton" id="cancel_create_tech_button">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
@@ -1714,7 +1714,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkButton" id="okbutton3">
+	    <widget class="GtkButton" id="ok_create_tech_button">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
@@ -1750,6 +1750,7 @@
 	      <child>
 		<widget class="GtkLabel" id="label5">
 		  <property name="visible">True</property>
+		  <property name="sensitive">False</property>
 		  <property name="label" translatable="yes">&lt;b&gt;Selected tech details&lt;/b&gt;</property>
 		  <property name="use_underline">False</property>
 		  <property name="use_markup">True</property>
@@ -1821,13 +1822,14 @@
 			    <widget class="GtkEntry" id="new_tech_name_entry">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="editable">False</property>
+			      <property name="editable">True</property>
 			      <property name="visibility">True</property>
 			      <property name="max_length">0</property>
 			      <property name="text" translatable="yes"></property>
 			      <property name="has_frame">True</property>
 			      <property name="invisible_char">*</property>
 			      <property name="activates_default">False</property>
+			      <signal name="changed" handler="on_new_tech_name_entry_changed" last_modification_time="Tue, 07 Jun 2005 20:17:34 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="padding">0</property>
@@ -1840,7 +1842,7 @@
 			    <widget class="GtkEntry" id="new_tech_name_str_entry">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="editable">False</property>
+			      <property name="editable">True</property>
 			      <property name="visibility">True</property>
 			      <property name="max_length">0</property>
 			      <property name="text" translatable="yes"></property>
@@ -1887,7 +1889,7 @@
 			      <property name="add_tearoffs">False</property>
 			      <property name="has_frame">True</property>
 			      <property name="focus_on_click">True</property>
-			      <signal name="changed" handler="on_tech_type_combo_box_changed" last_modification_time="Sun, 05 Jun 2005 20:34:01 GMT"/>
+			      <signal name="changed" handler="on_new_tech_type_combo_box_changed" last_modification_time="Tue, 07 Jun 2005 20:52:26 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="padding">0</property>
@@ -1947,7 +1949,7 @@
 			      <property name="add_tearoffs">False</property>
 			      <property name="has_frame">True</property>
 			      <property name="focus_on_click">True</property>
-			      <signal name="changed" handler="on_tech_category_combo_box_changed" last_modification_time="Sun, 05 Jun 2005 20:34:08 GMT"/>
+			      <signal name="changed" handler="on_new_tech_category_combo_box_changed" last_modification_time="Tue, 07 Jun 2005 20:52:42 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="padding">0</property>
@@ -2011,7 +2013,7 @@
 			      <property name="snap_to_ticks">False</property>
 			      <property name="wrap">False</property>
 			      <property name="adjustment">0 0 100 1 10 10</property>
-			      <signal name="value_changed" handler="on_tech_cost_button_value_changed" last_modification_time="Sun, 05 Jun 2005 18:13:07 GMT"/>
+			      <signal name="value_changed" handler="on_new_tech_cost_button_value_changed" last_modification_time="Tue, 07 Jun 2005 20:52:50 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="padding">0</property>
@@ -2056,7 +2058,7 @@
 			      <property name="snap_to_ticks">False</property>
 			      <property name="wrap">False</property>
 			      <property name="adjustment">1 0 100 1 10 10</property>
-			      <signal name="value_changed" handler="on_tech_turns_button_value_changed" last_modification_time="Sun, 05 Jun 2005 18:13:52 GMT"/>
+			      <signal name="value_changed" handler="on_new_tech_turns_button_value_changed" last_modification_time="Tue, 07 Jun 2005 20:52:58 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="padding">0</property>
@@ -2305,7 +2307,7 @@
 			      <property name="use_stock">True</property>
 			      <property name="relief">GTK_RELIEF_NORMAL</property>
 			      <property name="focus_on_click">True</property>
-			      <signal name="clicked" handler="on_add_prerequisite_clicked" last_modification_time="Sun, 05 Jun 2005 17:17:47 GMT"/>
+			      <signal name="clicked" handler="new_tech_on_add_prerequisite_clicked" last_modification_time="Tue, 07 Jun 2005 20:37:06 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="padding">0</property>
@@ -2323,7 +2325,7 @@
 			      <property name="use_stock">True</property>
 			      <property name="relief">GTK_RELIEF_NORMAL</property>
 			      <property name="focus_on_click">True</property>
-			      <signal name="clicked" handler="on_remove_prerequisite_clicked" last_modification_time="Sun, 05 Jun 2005 17:06:49 GMT"/>
+			      <signal name="clicked" handler="new_tech_on_remove_prerequisite_clicked" last_modification_time="Tue, 07 Jun 2005 20:37:13 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="padding">0</property>
@@ -2445,6 +2447,7 @@
 			  <property name="use_stock">True</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
 			  <property name="focus_on_click">True</property>
+			  <signal name="clicked" handler="on_add_item_to_new_tech_clicked" last_modification_time="Tue, 07 Jun 2005 20:17:01 GMT"/>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -2462,6 +2465,7 @@
 			  <property name="use_stock">True</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
 			  <property name="focus_on_click">True</property>
+			  <signal name="clicked" handler="on_remove_item_from_new_tech_clicked" last_modification_time="Tue, 07 Jun 2005 20:16:55 GMT"/>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -2562,6 +2566,7 @@
 			  <property name="use_stock">True</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
 			  <property name="focus_on_click">True</property>
+			  <signal name="clicked" handler="on_add_effect_to_new_tech_clicked" last_modification_time="Tue, 07 Jun 2005 20:16:46 GMT"/>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -2579,6 +2584,7 @@
 			  <property name="use_stock">True</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
 			  <property name="focus_on_click">True</property>
+			  <signal name="clicked" handler="on_remove_effect_from_new_tech_clicked" last_modification_time="Tue, 07 Jun 2005 20:16:28 GMT"/>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
