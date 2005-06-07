@@ -2,6 +2,10 @@ import sys, os, re
 
 upper_re = re.compile(r'^[_ABCDEFGHIJKLMNOPQRSTUVWXYZ\d]+$')
 
+def add_entries( string_table, strings ) :
+	for key, value in strings.items() :
+		string_table[key] = value 
+
 def remove_entries( string_table, strings ) :
 	for string in strings :
 		del string_table[string]
