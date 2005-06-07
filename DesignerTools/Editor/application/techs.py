@@ -137,6 +137,15 @@ class GameTechs :
 		self.tech_entries[tech.name] = tech
 		self.tech_categories[tech.category].append(tech.name)
 
+		try:
+
+			new_strings = tech.strings
+			strings = application.instance.supported_languages['English']
+			strtable.add_entries( strings, new_strings )	
+
+		except AttributeError :
+			pass
+
 	def remove_tech( self, tech_id ) :
 		tech = self.tech_entries[tech_id]
 
