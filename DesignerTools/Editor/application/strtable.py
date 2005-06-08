@@ -8,7 +8,10 @@ def add_entries( string_table, strings ) :
 
 def remove_entries( string_table, strings ) :
 	for string in strings :
-		del string_table[string]
+		try:
+			del string_table[string]
+		except KeyError :
+			print >> sys.stderr, "Could not remove", string, "because it is not in the string table!"
 
 def store_string_table( base, name, language, table ) :
 	filename = base + '/' + name
