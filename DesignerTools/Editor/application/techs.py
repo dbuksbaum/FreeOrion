@@ -143,6 +143,7 @@ class GameTechs :
 			strings = application.instance.supported_languages['English']
 			strtable.add_entries( strings, new_strings )	
 
+			application.instance.strings_modified = True
 		except AttributeError :
 			pass
 
