@@ -27,6 +27,7 @@ class TechWindowController :
 		self.view.signal_connect('on_add_prerequisite_clicked', self.__on_add_prerequisite )
 		self.view.signal_connect('on_remove_prerequisite_clicked', self.__on_remove_prerequisites )
 
+		self.view.signal_connect('on_tech_name_string_entry_changed', self.__on_tech_name_string_changed )
 		self.view.signal_connect('on_tech_cost_button_value_changed', self.__on_tech_cost_changed )
 		self.view.signal_connect('on_tech_turns_button_value_changed', self.__on_tech_turns_changed )
 		self.view.signal_connect('on_tech_type_combo_box_changed', self.__on_tech_type_changed )
@@ -55,7 +56,7 @@ class TechWindowController :
 		self.__setup_tech_categories_combo_box()
 
 		self.desc_text_buffer = gtk.TextBuffer()
-		self.desc_text_buffer.connect('modified-changed', self.__on_description_changed )
+		self.desc_text_buffer.connect('changed', self.__on_description_changed )
 		
 		self.current_tech = None
 		self.modified_techs = dict()
@@ -99,7 +100,10 @@ class TechWindowController :
 		strings = application.instance.supported_languages['English']
 		tech_listing = []
 		for tech_id in techs_to_remove :
-			tech_listing.append( "%s %s"%(tech_id, strings[tech_id]) )
+			try:
+				tech_listing.append( "%s %s"%(tech_id, strings[tech_id]) )
+			except KeyError :
+				tech_listing.append( "%s"%tech_id )
 		
 		message = """You are going to remove the following techs:
 
@@ -153,6 +157,15 @@ Are you sure you wish to remove them?"""%'\n'.join(tech_listing)
 			type_str_txt.set_text( strings[self.current_tech.type] )
 		except KeyError :
 			pass
+
+	def __on_tech_name_string_changed( self, editable ) :
+		if self.current_tech is None or self.refreshing: return
+
+		strings = application.instance.supported_languages['English']
+		strings[self.current_tech.name] = editable.get_text()				
+
+		self.current_tech.modified = True	
+		
 
 	def __setup_tech_types_combo_box( self ) :
 		tech_type_combo = self.view.get_widget( 'tech_type_combo_box' )	
@@ -290,6 +303,8 @@ Are you sure you wish to remove them?"""%'\n'.join(tech_listing)
 
 	def __clear_widgets( self ) :
 		self.refreshing = True
+		
+		strings = application.instance.supported_languages['English']
 
 		name_id_txt = self.view.get_widget('tech_name_identifier_entry')
 		name_id_txt.set_text( '' )
@@ -302,7 +317,7 @@ Are you sure you wish to remove them?"""%'\n'.join(tech_listing)
 		
 		type_str_txt = self.view.get_widget('tech_type_string_entry')
 		try:
-			type_str_txt.set_text( strings[self.current_tech.type] )
+			type_str_txt.set_text( strings['TT_THEORY'] )
 		except KeyError :
 			pass
 
@@ -321,7 +336,7 @@ Are you sure you wish to remove them?"""%'\n'.join(tech_listing)
 		turns_button.set_value( 1 )
 
 		icon_path = 'no_image.png'
-		icont = gtk.gdk.pixbuf_new_from_file(icon_path)	
+		icon = gtk.gdk.pixbuf_new_from_file(icon_path)	
 		tech_image = self.view.get_widget('tech_image')
 		tech_image.set_from_pixbuf( icon )
 
@@ -510,7 +525,7 @@ Are you sure you wish to remove them?"""%'\n'.join(tech_listing)
 				print "Removing tech", tech_id
 				tech_set.remove_tech( tech_id )
 			application.instance.techs_modified = True
-			application.instance.techs_modified = True
+			application.instance.strings_modified = True
 
 
 		if len(self.modified_techs) > 0 :
