@@ -39,7 +39,7 @@ class AddTechDlgController :
 		self.desc_text_buffer = gtk.TextBuffer()
 		self.desc_text_buffer.set_text("")
 		desc_str_txt = self.view.get_widget('new_tech_description_text_view')
-				
+		desc_str_txt.set_buffer( self.desc_text_buffer )		
 
 		tech_image = self.view.get_widget('new_tech_icon')
 		icon_path = 'no_image.png'
